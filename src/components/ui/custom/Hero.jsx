@@ -12,31 +12,31 @@ import { useRouter } from "next/navigation";
 
 function Hero() {
   const [userInput, setUserInput] = useState();
-  const {messages,setMessages}=useContext(MessagesContext)
-  const {userDetails,setUserDetails}=useContext(UserDetailContext)
+  const { messages, setMessages } = useContext(MessagesContext);
+  const { userDetails, setUserDetails } = useContext(UserDetailContext);
   const [openDialog, setOpenDialog] = useState(false);
   const CreateWorkspace = useMutation(api.workspace.CreateWorkspace);
   const router = useRouter();
 
-
-  const onGenerate=async (input)=>{
-    if(!userDetails?.name){
-        setOpenDialog(true);
-        return;
+  const onGenerate = async (input) => {
+    if (!userDetails?.name) {
+      setOpenDialog(true);
+      return;
     }
-const msg ={
-  role:"user",
-  context:input
-}
-setMessages(msg)
-const workspaceId = await CreateWorkspace({
-  user:userDetails._id,
-  messages:[msg]
-})
-console.log(workspaceId);
-router.push('/workspace/'+workspaceId);
+    const msg = {
+      role: "user",
+      context: input,
+    };
+    setMessages([msg]);
+    const workspaceId = await CreateWorkspace({
+      user: userDetails._id,
+      messages: [msg],
+    });
+    console.log(workspaceId);
+    router.push("/workspace/" + workspaceId);
+  };
 
-  }
+  
   return (
     <div className="flex flex-col items-center mt-36 xl:mt-52 gap-2 ">
       <h2 className="font-bold text-3xl">{Lookup.HERO_HEADING}</h2>
@@ -56,9 +56,10 @@ router.push('/workspace/'+workspaceId);
             }}
           />
           {userInput && (
-            <ArrowUp 
-            onClick={()=>onGenerate(userInput)}
-            className="bg-gradient-to-t from-blue-600 to-blue-900 p-2 h-8 w-8 rounded-md cursor-pointer" />
+            <ArrowUp
+              onClick={() => onGenerate(userInput)}
+              className="bg-gradient-to-t from-blue-600 to-blue-900 p-2 h-8 w-8 rounded-md cursor-pointer"
+            />
           )}
         </div>
         <div>
@@ -68,7 +69,7 @@ router.push('/workspace/'+workspaceId);
       <div className="flex flex-wrap max-w-2xl justify-center mt-3">
         {Lookup?.SUGGSTIONS.map((suggestion, index) => (
           <h2
-          onClick={()=>onGenerate(suggestion)}
+            onClick={() => onGenerate(suggestion)}
             key={index}
             className="px-2 border rounded-full gap-3 m-1 text-sm text-gray-500 hover:text-white cursor-pointer "
           >
@@ -76,7 +77,10 @@ router.push('/workspace/'+workspaceId);
           </h2>
         ))}
       </div>
-      <SigninDialog openDialog={openDialog} closeDialog={(v)=>setOpenDialog(v)}/>
+      <SigninDialog
+        openDialog={openDialog}
+        closeDialog={(v) => setOpenDialog(v)}
+      />
     </div>
   );
 }
