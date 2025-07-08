@@ -7,8 +7,10 @@ import { MessagesContext } from '@/context/MessagesContext';
 import Colors from '@/data/Colors';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import Image from 'next/image';
-import { ArrowUp, Link } from 'lucide-react';
+import { ArrowRight, Link } from 'lucide-react';
 import Lookup from '@/data/Lookup';
+import axios from 'axios';
+import Prompt from '@/data/Prompt';
 
 function ChatView() {
     const {id} = useParams();
@@ -30,8 +32,23 @@ function ChatView() {
         });
         setMessages(result?.messages);
         console.log("workspace data",result);
-        
+    }
+useEffect(()=>{
+        if(messages?.length > 0){
+            const role = messages[messages.length - 1].role;
+            if(role === 'user'){
+                GetAiResponse();
+            }    
+        }
+},[messages])
 
+    const GetAiResponse=async ()=>{
+      const PROMPT = JSON.stringify(messages)+Prompt.CHAT_PROMPT;
+      const result = await axios.post('/api/ai-chat',{
+        prompt: PROMPT
+
+      })
+      console.log(result.data.result)
     }
 
   return (
@@ -67,9 +84,9 @@ function ChatView() {
             }}
           />
           {userInput && (
-            <ArrowUp
+            <ArrowRight
               onClick={() => onGenerate(userInput)}
-              className="bg-gradient-to-t from-blue-600 to-blue-900 p-2 h-8 w-8 rounded-md cursor-pointer"
+              className="bg-gradient-to-t from-blue-600 to-blue-900 p-2 h-8 w-14 rounded-md cursor-pointer"
             />
           )}
         </div>
