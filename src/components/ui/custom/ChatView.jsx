@@ -1,75 +1,146 @@
-"use client"
-import { useConvex } from 'convex/react';
-import { useParams } from 'next/navigation';
-import React, { useContext, useEffect, useState } from 'react'
-import { api } from '../../../../convex/_generated/api';
-import { MessagesContext } from '@/context/MessagesContext';
-import Colors from '@/data/Colors';
-import { UserDetailContext } from '@/context/UserDetailContext';
-import Image from 'next/image';
-import { ArrowRight, Link } from 'lucide-react';
-import Lookup from '@/data/Lookup';
-import axios from 'axios';
-import Prompt from '@/data/Prompt';
+"use client";
+import { useConvex } from "convex/react";
+import { useParams } from "next/navigation";
+import React, { useContext, useEffect, useState } from "react";
+import { api } from "../../../../convex/_generated/api";
+import { MessagesContext } from "@/context/MessagesContext";
+import Colors from "@/data/Colors";
+import { UserDetailContext } from "@/context/UserDetailContext";
+import Image from "next/image";
+import { ArrowRight, Loader2Icon } from "lucide-react";
+import Lookup from "@/data/Lookup";
+import axios from "axios";
+import Prompt from "@/data/Prompt";
 
 function ChatView() {
-    const {id} = useParams();
-    const convex =useConvex();
-    const {messages,setMessages} = useContext(MessagesContext);
-    const {userDetails, setUserDetails} = useContext(UserDetailContext);
-    const [userInput, setUserInput] = useState();
+  const { id } = useParams();
+  const convex = useConvex();
+  const { messages, setMessages } = useContext(MessagesContext);
+  const { userDetails } = useContext(UserDetailContext);
 
+  const [userInput, setUserInput] = useState("");
+  const [loading, setLoading] = useState(false);
 
+  // fetch workspace data when id changes
+  useEffect(() => {
+    if (id) GetWorkspaceData();
+  }, [id]);
 
-    useEffect(()=>{
-        id && GetWorkspaceData();
-    },[id])
+  const GetWorkspaceData = async () => {
+    const result = await convex.query(api.workspace.GetWorkspace, {
+      workspaceId: id,
+    });
+    setMessages(result?.messages || []);
+    console.log("workspace data", result);
+  };
 
-
-    const GetWorkspaceData=async ()=>{
-        const result = await convex.query(api.workspace.GetWorkspace ,{
-            workspaceId:id
-        });
-        setMessages(result?.messages);
-        console.log("workspace data",result);
+  // trigger AI response when a user message is added
+  useEffect(() => {
+    if (messages?.length > 0) {
+      const lastRole = messages[messages.length - 1].role;
+      if (lastRole === "user") {
+        GetAiResponse();
+      }
     }
-useEffect(()=>{
-        if(messages?.length > 0){
-            const role = messages[messages.length - 1].role;
-            if(role === 'user'){
-                GetAiResponse();
-            }    
+  }, [messages]);
+
+  const GetAiResponse = async () => {
+    setLoading(true);
+    const PROMPT = JSON.stringify(messages) + Prompt.CHAT_PROMPT;
+
+    try {
+      const result = await axios.post("/api/ai-chat", {
+        prompt: PROMPT,
+      });
+
+      console.log("AI response:", result.data);
+
+      let aiText = "No response";
+
+      if (result?.data?.result) {
+        if (typeof result.data.result === "string") {
+          aiText = result.data.result;
+        } else if (typeof result.data.result.text === "string") {
+          aiText = result.data.result.text;
+        } else {
+          aiText = JSON.stringify(result.data.result);
         }
-},[messages])
+      } else {
+        aiText = JSON.stringify(result.data);
+      }
 
-    const GetAiResponse=async ()=>{
-      const PROMPT = JSON.stringify(messages)+Prompt.CHAT_PROMPT;
-      const result = await axios.post('/api/ai-chat',{
-        prompt: PROMPT
-
-      })
-      console.log(result.data.result)
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "ai",
+          context: aiText,
+        },
+      ]);
+    } catch (err) {
+      console.error(err);
+      setMessages((prev) => [
+        ...prev,
+        { role: "ai", context: "Error: Could not generate response." },
+      ]);
     }
+
+    setLoading(false);
+  };
+
+  const onGenerate = (input) => {
+    if (!input.trim()) return;
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "user",
+        context: input,
+      },
+    ]);
+
+    setUserInput("");
+  };
 
   return (
-    <div className='relative h-[85vh] flex flex-col'>
-     <div className='flex-1 overflow-y-scroll'>
-       {
-        messages?.map((msg,index)=>(
-            <div key={index} className='p-3 rounded-lg mb-2 flex gap-2 items-start' style={{
-                backgroundColor :Colors.BACKGROUND
-            }}>
-                {msg?.role == 'user'&&<Image src={userDetails.picture} alt='userImage' width ={35} height={35} className='rounded-full'/>}
-                <h2>
-                    {msg.context}
-                </h2>
-            </div>
-        ))
-       }
-     </div>
-     {/* Input Section */}
+    <div className="relative h-[85vh] flex flex-col">
+      {/* Messages */}
+      <div className="flex-1 overflow-y-scroll mb-2 px-2">
+        {messages?.map((msg, index) => (
+          <div
+            key={index}
+            className="p-3 rounded-lg mb-2 flex gap-2 items-start leading-7"
+            style={{
+              backgroundColor: Colors.BACKGROUND,
+            }}
+          >
+            {msg?.role === "user" && userDetails?.picture && (
+              <Image
+                src={userDetails.picture}
+                alt="user"
+                width={35}
+                height={35}
+                className="rounded-lg"
+              />
+            )}
+            <h2>{msg?.context || "No content"}</h2>
+          </div>
+        ))}
 
-       <div
+        {loading && (
+          <div
+            className="p-3 rounded-lg mb-2 flex gap-2 items-start"
+            style={{
+              backgroundColor: Colors.BACKGROUND,
+            }}
+          >
+            <Loader2Icon className="animate-spin" />
+            <h2>Generating response…</h2>
+          </div>
+        )}
+      </div>
+
+      {/* Input Section */}
+      <div
         style={{
           backgroundColor: Colors.BACKGROUND,
         }}
@@ -77,25 +148,27 @@ useEffect(()=>{
       >
         <div className="flex gap-2">
           <textarea
-            className="outline-none bg-transparent w-xl h-22 max-h-56 resize-none  "
+            className="outline-none bg-transparent w-xl h-22 max-h-56 resize-none"
             placeholder={Lookup.INPUT_PLACEHOLDER}
-            onChange={(event) => {
-              setUserInput(event.target.value);
+            value={userInput}
+            onChange={(event) => setUserInput(event.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault(); // Prevent newline
+                onGenerate(userInput);
+              }
             }}
           />
-          {userInput && (
+          {userInput.trim() && (
             <ArrowRight
               onClick={() => onGenerate(userInput)}
               className="bg-gradient-to-t from-blue-600 to-blue-900 p-2 h-8 w-14 rounded-md cursor-pointer"
             />
           )}
         </div>
-        <div>
-          <Link className="w-4 h-4"></Link>
-        </div>
-        </div>
+      </div>
     </div>
-  )
+  );
 }
 
-export default ChatView
+export default ChatView;
