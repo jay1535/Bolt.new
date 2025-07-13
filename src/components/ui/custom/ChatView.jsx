@@ -11,6 +11,7 @@ import { ArrowRight, Loader2Icon } from "lucide-react";
 import Lookup from "@/data/Lookup";
 import axios from "axios";
 import Prompt from "@/data/Prompt";
+import ReactMarkdown from "react-markdown";
 
 function ChatView() {
   const { id } = useParams();
@@ -126,7 +127,9 @@ function ChatView() {
                 className="rounded-lg"
               />
             )}
-            <h2>{msg?.context || "No content"}</h2>
+            <h2 className='flex flex-col'>
+            <ReactMarkdown>{msg?.context || "No content"}</ReactMarkdown>
+            </h2>
           </div>
         ))}
 
@@ -152,6 +155,7 @@ function ChatView() {
       >
         <div className="flex gap-2">
           <textarea
+          
             className="outline-none bg-transparent w-xl h-22 max-h-56 resize-none"
             placeholder={Lookup.INPUT_PLACEHOLDER}
             value={userInput}
