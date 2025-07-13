@@ -1,5 +1,5 @@
 "use client";
-import { useConvex } from "convex/react";
+import { useConvex, useMutation } from "convex/react";
 import { useParams } from "next/navigation";
 import React, { useContext, useEffect, useState } from "react";
 import { api } from "../../../../convex/_generated/api";
@@ -17,7 +17,7 @@ function ChatView() {
   const convex = useConvex();
   const { messages, setMessages } = useContext(MessagesContext);
   const { userDetails } = useContext(UserDetailContext);
-
+  const UpdateMessages= useMutation(api.workspace.UpdateMessages);
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -68,14 +68,18 @@ function ChatView() {
       } else {
         aiText = JSON.stringify(result.data);
       }
-
+    const aiResp = {
+        role: "ai",
+        context: aiText,
+      };
       setMessages((prev) => [
         ...prev,
-        {
-          role: "ai",
-          context: aiText,
-        },
+       aiResp,
       ]);
+      await UpdateMessages({
+      workspaceId: id,
+      messages: [...messages, aiResp],
+    });
     } catch (err) {
       console.error(err);
       setMessages((prev) => [
@@ -83,7 +87,7 @@ function ChatView() {
         { role: "ai", context: "Error: Could not generate response." },
       ]);
     }
-
+    
     setLoading(false);
   };
 
