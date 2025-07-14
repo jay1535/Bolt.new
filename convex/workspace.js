@@ -44,7 +44,7 @@ export const UpdateFiles = mutation({
   },
   handler:async(ctx, args)=>{
     const result = await ctx.db.patch(args.workspaceId, {
-      fileData: args.files
+      fileData: args.files,
     });
     return result;
   }
