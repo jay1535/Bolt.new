@@ -7,11 +7,13 @@ import {
   SandpackPreview,
   SandpackFileExplorer,
 } from "@codesandbox/sandpack-react";
+import Lookup from "@/data/Lookup";
 
 
 
 function CodeView() {
   const [activeTab, setActiveTab] =useState("preview");
+  const [file, setFiles]=useState(Lookup?.DEFAULT_FILE)
   return (
     <div className="border-none rounded-2xl">
       <div className="bg-[#181818] w-full p-2 border rounded-lg">
@@ -26,7 +28,18 @@ function CodeView() {
             ${activeTab=='preview'&&'text-blue-600  p-1 px-2 rounded-full'}`}>Preview</h2>
         </div>
       </div>
-      <SandpackProvider template="react" theme={"dark"}>
+      <SandpackProvider
+      file ={file}
+      template="react" theme={"dark"}
+      customSetup={{
+        dependencies:{
+          ...Lookup.DEPENDANCY
+        }
+      }}
+      options={{
+        externalResources:['https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4']
+      }}
+      >
         <SandpackLayout  style={{
       borderRadius: "0.5rem", 
       overflow: "hidden",    
@@ -47,6 +60,7 @@ function CodeView() {
           </>:
           <>
           <SandpackPreview
+          showNavigator={true}
             style={{
               height: "77vh",
             }}
