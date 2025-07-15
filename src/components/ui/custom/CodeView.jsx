@@ -10,50 +10,69 @@ import {
 import Lookup from "@/data/Lookup";
 import { MessagesContext } from "@/context/MessagesContext";
 import Prompt from "@/data/Prompt";
-import axios from "axios";
-import { useMutation } from "convex/react";
+import { useConvex, useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { useParams } from "next/navigation";
+import axios from "axios";
+import { Loader } from "lucide-react";
+
 
 
 
 function CodeView() {
-  const [activeTab, setActiveTab] =useState("");
-  const [file, setFiles]=useState(Lookup?.DEFAULT_FILE)
+  const [activeTab, setActiveTab] =useState("code");
+  const [files, setFiles]=useState(Lookup?.DEFAULT_FILE)
   const {messages,setMessages} = useContext(MessagesContext)
   const UpdateFiles = useMutation(api.workspace.UpdateFiles);
   const  {id} = useParams();
+  const convex = useConvex()
+  const [loading, setLoading] = useState(false);
 
+  useEffect (()=>{
+id&&GetFiles();
+  },[id])
 
+const GetFiles=async ()=>{
+  setLoading(true)
+  const result = await convex.query(api.workspace.GetWorkspace,{
+    workspaceId:id
+  })
+  const mergedFiles = { ...Lookup.DEFAULT_FILE, ...result?.fileData };
+  setFiles(mergedFiles);
+  setLoading(false)
+}
  useEffect(() => {
      if (messages?.length > 0) {
-       const lastRole = messages[messages.length - 1].role;
-       if (lastRole === "user") {
-         GenerateAiCode();
+       const role = messages[messages.length - 1].role;
+       if (role === "user") {
+         GenerateAiCode(); 
        }
      }
    }, [messages]);
 
-  const GenerateAiCode =async()=>{
-    
-    const PROMPT = JSON.stringify(messages)+" "+ Prompt.CODE_GEN_PROMPT;
-    const result = await axios.post('/api/gen-ai-code',{
-      prompt: PROMPT
-    })
-    console.log(result.data);
-    const aiResp=result.data;
+ const GenerateAiCode = async () => {
+  setLoading(true)
+  const PROMPT = JSON.stringify(messages) + " " + Prompt.CODE_GEN_PROMPT;
+  const result = await axios.post('/api/gen-ai-code', {
+    prompt: PROMPT
+  });
+  console.log("AI Response:", result.data);
+  const aiResp = result.data;
 
-    const mergeFiles = {...Lookup.DEFAULT_FILE, ...aiResp?.files};
-    setFiles(mergeFiles);
-     await UpdateFiles(aiResp?.files, {
-      workspaceId: id,
-      files: aiResp?.files
-    });
+  // Merge and wrap properly
+  const mergedFiles = { ...Lookup.DEFAULT_FILE, ...aiResp?.files };
+  setFiles(mergedFiles);
 
-  }
+  await UpdateFiles({
+    workspaceId: id,
+    files: aiResp?.files,
+  });
+  setLoading(false)
+};
+
 
   return (
-    <div className="border-none rounded-2xl">
+    <div className="border-none rounded-2xl relative">
       <div className="bg-[#181818] w-full p-2 border rounded-lg">
         <div className="flex items-center justify-center flex-wrap shrink-0 bg-gray-900 p-1 w-[140px] border rounded-full gap-3 ">
           <h2 
@@ -67,7 +86,7 @@ function CodeView() {
         </div>
       </div>
       <SandpackProvider
-      files ={file}
+      files ={files}
       template="react" theme={"dark"}
       customSetup={{
         dependencies:{
@@ -106,6 +125,12 @@ function CodeView() {
           </>}
         </SandpackLayout>
       </SandpackProvider>
+    {loading &&  <div className="p-10 bg-black opacity-80 absolute top-0 rounded-lg w-full h-full flex items-center justify-center">
+        <Loader 
+        className="animate-spin h-7 w-7 m-2 text-white"
+        style={{ animationDuration: "2.5s" }}/>
+        <h2 className="text-white">Generation Files...</h2>
+      </div>}
     </div>
   );
 }
