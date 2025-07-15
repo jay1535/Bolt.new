@@ -7,7 +7,7 @@ function Header() {
   const {userDetails,setUserDetails}=useContext(UserDetailContext);
   return (
     <div className='p-1 flex items-center justify-between'>
-     <FaBolt className='text-2xl  text-blue-600' />
+     <FaBolt className='text-2xl m-1  text-blue-600' />
      {!userDetails?.name &&    <div className='flex gap-5 mt-2'>
       <Button variant="ghost">
         Sign In

@@ -17,7 +17,7 @@ function ChatView() {
   const { id } = useParams();
   const convex = useConvex();
   const { messages, setMessages } = useContext(MessagesContext);
-  const { userDetails } = useContext(UserDetailContext);
+  const { userDetails,setUserDetails } = useContext(UserDetailContext);
   const UpdateMessages= useMutation(api.workspace.UpdateMessages);
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
