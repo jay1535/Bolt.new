@@ -12,6 +12,7 @@ import Lookup from "@/data/Lookup";
 import axios from "axios";
 import Prompt from "@/data/Prompt";
 import ReactMarkdown from "react-markdown";
+import { useSidebar } from "../sidebar";
 
 function ChatView() {
   const { id } = useParams();
@@ -21,6 +22,7 @@ function ChatView() {
   const UpdateMessages= useMutation(api.workspace.UpdateMessages);
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const {toggleSidebar} = useSidebar();
 
   // fetch workspace data when id changes
   useEffect(() => {
@@ -115,6 +117,7 @@ function ChatView() {
   >
     {userDetails && (
       <Image
+      onClick={toggleSidebar}
         src={userDetails.picture}
         alt="UserPicture"
         width={30}
@@ -125,7 +128,7 @@ function ChatView() {
   </div>
 
 
-    <div className="relative h-[85vh] flex flex-col flex-1">
+    <div className="relative h-[85vh]  flex flex-col flex-1">
       {/* Messages */}
       <div className="flex-1 overflow-y-scroll mb-2 px-2">
         {messages?.map((msg, index) => (

@@ -2,22 +2,15 @@ import React, { useContext } from "react";
 import { FaBolt } from "react-icons/fa6";
 import { Button } from "../button";
 import { UserDetailContext } from "@/context/UserDetailContext";
-import { LogOut } from "lucide-react";
+import { Github, Linkedin, Instagram } from "lucide-react";
 
-function Header() {
-  const { userDetails, setUserDetails } = useContext(UserDetailContext);
-
-  const handleSignOut = () => {
-    setUserDetails(null);
-    console.log("User signed out");
-  };
+function Header({ isHeroPage }) {
+  const { userDetails } = useContext(UserDetailContext);
 
   return (
     <div
       className="p-2 flex items-center justify-between w-full"
-      style={{
-        background: "transparent",
-      }}
+      style={{ background: "transparent" }}
     >
       {/* Left: Logo */}
       <div className="flex items-center gap-2">
@@ -25,8 +18,8 @@ function Header() {
         <span className="font-bold text-lg">Bolt.new</span>
       </div>
 
-      {/* Right: Auth Buttons */}
-      <div className="flex gap-3">
+      {/* Right: Buttons or Social Links */}
+      <div className="flex gap-4 items-center">
         {!userDetails?.name ? (
           <>
             <Button variant="ghost">Sign In</Button>
@@ -35,13 +28,36 @@ function Header() {
             </Button>
           </>
         ) : (
-          <Button
-            onClick={handleSignOut}
-            className="text-white bg-gradient-to-l from-blue-500 via-blue-600 to-blue-900 flex items-center gap-2"
-          >
-            <LogOut className="w-4 h-4" />
-            Sign Out
-          </Button>
+          <>
+            {isHeroPage && (
+              <>
+                <a
+                  href="https://github.com/your-github"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-blue-600 transition"
+                >
+                  <Github className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://linkedin.com/in/your-linkedin"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-blue-600 transition"
+                >
+                  <Linkedin className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://instagram.com/your-instagram"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-blue-600 transition"
+                >
+                  <Instagram className="w-5 h-5" />
+                </a>
+              </>
+            )}
+          </>
         )}
       </div>
     </div>

@@ -11,6 +11,7 @@ import { FaBolt } from 'react-icons/fa6'
 import { Button } from '../button'
 import { MessageCircleCodeIcon } from 'lucide-react'
 import WorkSpaceHistory from './WorkSpaceHistory'
+import SideBarFooter from './SideBarFooter'
 
 function AppSideBar() {
   return (
@@ -23,9 +24,11 @@ function AppSideBar() {
         <SidebarGroup>
             <WorkSpaceHistory/>
         </SidebarGroup>
-        <SidebarGroup />
+        {/* <SidebarGroup /> */}
       </SidebarContent>
-      <SidebarFooter />
+      <SidebarFooter>
+        <SideBarFooter/>
+      </SidebarFooter>
     </Sidebar>
   )
 }

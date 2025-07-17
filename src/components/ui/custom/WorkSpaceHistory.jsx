@@ -28,7 +28,6 @@ function WorkSpaceHistory() {
         userId: userDetails._id,
       });
       setWorkspaceList(result);
-      console.log(result);
     } catch (error) {
       console.error("Failed to fetch workspaces", error);
     } finally {
@@ -38,22 +37,28 @@ function WorkSpaceHistory() {
 
   return (
     <div>
-      <h2 className="font-medium text-lg">Your Chats</h2>
+      <h2 className="font-medium text-lg text-white">Your Chats</h2>
 
-      <div className="mt-2">
+      <div
+        className="mt-2 p-3 rounded-lg border border-blue-800 shadow-md"
+        style={{ backgroundColor: "rgba(30, 41, 59, 0.6)" }}
+      >
         {loading ? (
           <p className="text-md text-gray-300">Loading workspaces...</p>
         ) : workspaceList.length > 0 ? (
           workspaceList.map((workspace) => (
-            <Link
-              href={`/workspace/${workspace?._id}`}
+            <div
               key={workspace._id}
-              onClick={toggleSidebar}
+              className="flex p-2 rounded-md cursor-pointer hover:bg-gray-800 transition-colors"
             >
-              <h2 className="text-sm text-gray-400 mt-2 font-medium hover:text-white cursor-pointer">
+              <Link
+                href={`/workspace/${workspace._id}`}
+                onClick={toggleSidebar}
+                className="flex-1 text-sm text-gray-300 hover:text-white"
+              >
                 {workspace?.messages?.[0]?.context ?? "No context"}
-              </h2>
-            </Link>
+              </Link>
+            </div>
           ))
         ) : (
           <p className="text-md text-white">No workspaces found.</p>
