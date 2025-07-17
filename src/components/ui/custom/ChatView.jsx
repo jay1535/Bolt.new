@@ -14,6 +14,14 @@ import Prompt from "@/data/Prompt";
 import ReactMarkdown from "react-markdown";
 import { useSidebar } from "../sidebar";
 
+export const countToken = (inputText) => {
+  return inputText
+    .trim()
+    .split(/\s+/)
+    .filter((word) => word).length;
+};
+
+
 function ChatView() {
   const { id } = useParams();
   const convex = useConvex();
@@ -23,6 +31,7 @@ function ChatView() {
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
   const {toggleSidebar} = useSidebar();
+  const UpdateToken = useMutation(api.users.UpdateToken);
 
   // fetch workspace data when id changes
   useEffect(() => {
@@ -68,7 +77,7 @@ function ChatView() {
         } else {
           aiText = JSON.stringify(result.data.result);
         }
-      } else {
+      } else { 
         aiText = JSON.stringify(result.data);
       }
     const aiResp = {
@@ -79,6 +88,14 @@ function ChatView() {
         ...prev,
        aiResp,
       ]);
+
+ const token = Number(userDetails?.token) - Number(countToken(JSON.stringify(aiResp)));
+    setUserDetails(prev=>( {...prev, token: token}))
+    await UpdateToken({
+      token: token,
+      userId: userDetails?._id
+    })
+
       await UpdateMessages({
       workspaceId: id,
       messages: [...messages, aiResp],
@@ -112,7 +129,7 @@ function ChatView() {
     <div className="flex">
   {/* Sidebar */}
   <div
-    className="flex flex-col justify-end items-center w-15 h-full p-2"
+    className="flex flex-col  justify-end items-center w-15 h-full p-2"
     style={{ backgroundColor: "transparent" }}
   >
     {userDetails && (

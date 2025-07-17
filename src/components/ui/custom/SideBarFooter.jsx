@@ -16,7 +16,7 @@ function SideBarFooter() {
       icon: HelpCircle,
     },
     {
-      name: 'My Subscription',
+      name: 'Subscription',
       icon: Wallet,
       // path: '/pricing',
     },

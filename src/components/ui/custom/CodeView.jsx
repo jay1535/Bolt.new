@@ -15,7 +15,8 @@ import { api } from "../../../../convex/_generated/api";
 import { useParams } from "next/navigation";
 import axios from "axios";
 import { Loader } from "lucide-react";
-
+import { countToken } from "./ChatView";
+import { UserDetailContext } from "@/context/UserDetailContext";
 
 
 
@@ -27,6 +28,8 @@ function CodeView() {
   const  {id} = useParams();
   const convex = useConvex()
   const [loading, setLoading] = useState(false);
+  const { userDetails,setUserDetails } = useContext(UserDetailContext);
+  const UpdateToken = useMutation(api.users.UpdateToken);
 
   useEffect (()=>{
 id&&GetFiles();
@@ -52,6 +55,7 @@ const GetFiles=async ()=>{
 
  const GenerateAiCode = async () => {
   setLoading(true)
+  setActiveTab('code')
   const PROMPT = JSON.stringify(messages) + " " + Prompt.CODE_GEN_PROMPT;
   const result = await axios.post('/api/gen-ai-code', {
     prompt: PROMPT
@@ -67,6 +71,13 @@ const GetFiles=async ()=>{
     workspaceId: id,
     files: aiResp?.files,
   });
+   const token = Number(userDetails?.token) - Number(countToken(JSON.stringify(aiResp)));
+      setUserDetails(prev=>( {...prev, token: token}))
+      await UpdateToken({
+        token: token,
+        userId: userDetails?._id
+      })
+      setActiveTab('preview')
   setLoading(false)
 };
 
@@ -129,7 +140,7 @@ const GetFiles=async ()=>{
         <Loader 
         className="animate-spin h-7 w-7 m-2 text-white"
         style={{ animationDuration: "2.5s" }}/>
-        <h2 className="text-white">Generation Files....</h2>
+        <h2 className="text-white">Generating Files....</h2>
       </div>}
     </div>
   );
