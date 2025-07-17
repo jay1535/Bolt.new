@@ -129,7 +129,7 @@ const GetFiles=async ()=>{
         <Loader 
         className="animate-spin h-7 w-7 m-2 text-white"
         style={{ animationDuration: "2.5s" }}/>
-        <h2 className="text-white">Generation Files...</h2>
+        <h2 className="text-white">Generation Files....</h2>
       </div>}
     </div>
   );

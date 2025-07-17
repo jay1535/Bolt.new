@@ -3,7 +3,7 @@ import { MessagesContext } from "@/context/MessagesContext";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import Colors from "@/data/Colors";
 import Lookup from "@/data/Lookup";
-import { ArrowUp, Link } from "lucide-react";
+import { ArrowRight,  Link } from "lucide-react";
 import React, { useContext, useState } from "react";
 import SigninDialog from "./SigninDialog";
 import { useMutation } from "convex/react";
@@ -33,7 +33,7 @@ function Hero() {
     setMessages([msg]);
 
     const workspaceId = await CreateWorkspace({
-      user: userDetails._id,
+      user: userDetails?._id,
       messages: [msg],
     });
 
@@ -65,7 +65,7 @@ function Hero() {
             }}
           />
           {userInput && (
-            <ArrowUp
+            <ArrowRight
               onClick={() => onGenerate(userInput)}
               className="bg-gradient-to-t from-blue-600 to-blue-900 p-2 h-8 w-8 rounded-md cursor-pointer"
             />

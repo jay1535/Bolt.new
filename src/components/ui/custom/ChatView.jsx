@@ -107,7 +107,25 @@ function ChatView() {
   };
 
   return (
-    <div className="relative h-[85vh] flex flex-col">
+    <div className="flex">
+  {/* Sidebar */}
+  <div
+    className="flex flex-col justify-end items-center w-15 h-full p-2"
+    style={{ backgroundColor: "transparent" }}
+  >
+    {userDetails && (
+      <Image
+        src={userDetails.picture}
+        alt="UserPicture"
+        width={30}
+        height={30}
+        className="rounded-full mb-2"
+      />
+    )}
+  </div>
+
+
+    <div className="relative h-[85vh] flex flex-col flex-1">
       {/* Messages */}
       <div className="flex-1 overflow-y-scroll mb-2 px-2">
         {messages?.map((msg, index) => (
@@ -146,7 +164,9 @@ function ChatView() {
         )}
       </div>
 
+
       {/* Input Section */}
+      
       <div
         style={{
           backgroundColor: Colors.BACKGROUND,
@@ -156,7 +176,7 @@ function ChatView() {
         <div className="flex gap-2">
           <textarea
           
-            className="outline-none bg-transparent w-xl h-22 max-h-56 resize-none"
+            className="outline-none bg-transparent w-full h-22 max-h-56 resize-none"
             placeholder={Lookup.INPUT_PLACEHOLDER}
             value={userInput}
             onChange={(event) => setUserInput(event.target.value)}
@@ -170,12 +190,16 @@ function ChatView() {
           {userInput.trim() && (
             <ArrowRight
               onClick={() => onGenerate(userInput)}
-              className="bg-gradient-to-t from-blue-600 to-blue-900 p-2 h-8 w-14 rounded-md cursor-pointer"
+              className="bg-gradient-to-t from-blue-600 to-blue-900 p-2 h-8 w-14 
+              rounded-md cursor-pointer"
             />
           )}
         </div>
       </div>
+      
     </div>
+    </div>
+  
   );
 }
 
