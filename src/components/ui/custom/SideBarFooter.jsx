@@ -5,11 +5,12 @@ import React, { useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '../button';
 import { UserDetailContext } from '@/context/UserDetailContext';
-
+import { useSidebar } from "../sidebar";
 
 function SideBarFooter() {
   const router = useRouter();
   const { setUserDetails } = useContext(UserDetailContext);
+  const { toggleSidebar } = useSidebar();
 
   const options = [
     {
@@ -46,6 +47,9 @@ function SideBarFooter() {
     } else {
       console.warn(`No action or path defined for ${option.name}`);
     }
+
+    // Close sidebar
+    toggleSidebar();
   };
 
   return (

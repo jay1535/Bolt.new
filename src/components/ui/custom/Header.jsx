@@ -1,11 +1,26 @@
-import React, { useContext } from "react";
+"use client";
+
+import React, { useContext, useState } from "react";
+import { useRouter } from "next/navigation";
 import { FaBolt } from "react-icons/fa6";
 import { Button } from "../button";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import { Github, Linkedin, Instagram } from "lucide-react";
+import SigninDialog from "./SigninDialog";
 
 function Header({ isHeroPage }) {
   const { userDetails } = useContext(UserDetailContext);
+  const router = useRouter();
+
+  const [showSignIn, setShowSignIn] = useState(false);
+
+  const handleGetStarted = () => {
+    if (!userDetails?.name) {
+      setShowSignIn(true);
+    } else {
+      router.push("/dashboard"); // or /app
+    }
+  };
 
   return (
     <div
@@ -13,7 +28,10 @@ function Header({ isHeroPage }) {
       style={{ background: "transparent" }}
     >
       {/* Left: Logo */}
-      <div className="flex items-center gap-2">
+      <div
+        className="flex items-center gap-2 cursor-pointer"
+        onClick={() => router.push("/")}
+      >
         <FaBolt className="text-2xl text-blue-600" />
         <span className="font-bold text-lg">Bolt.new</span>
       </div>
@@ -22,8 +40,13 @@ function Header({ isHeroPage }) {
       <div className="flex gap-4 items-center">
         {!userDetails?.name ? (
           <>
-            <Button variant="ghost">Sign In</Button>
-            <Button className="text-white bg-gradient-to-l from-blue-500 via-blue-600 to-blue-900">
+            <Button variant="ghost" onClick={() => setShowSignIn(true)}>
+              Sign In
+            </Button>
+            <Button
+              className="text-white bg-gradient-to-l from-blue-500 via-blue-600 to-blue-900"
+              onClick={handleGetStarted}
+            >
               Get Started
             </Button>
           </>
@@ -60,6 +83,9 @@ function Header({ isHeroPage }) {
           </>
         )}
       </div>
+
+      {/* Signin Dialog */}
+      <SigninDialog openDialog={showSignIn} closeDialog={setShowSignIn} />
     </div>
   );
 }

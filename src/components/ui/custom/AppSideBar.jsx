@@ -1,36 +1,56 @@
-import React from 'react'
+"use client";
+
+import React from "react";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
   SidebarHeader,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
-import { FaBolt } from 'react-icons/fa6'
-import { Button } from '../button'
-import { MessageCircleCodeIcon } from 'lucide-react'
-import WorkSpaceHistory from './WorkSpaceHistory'
-import SideBarFooter from './SideBarFooter'
+import { FaBolt } from "react-icons/fa6";
+import { Button } from "../button";
+import { MessageCircleCodeIcon } from "lucide-react";
+import WorkSpaceHistory from "./WorkSpaceHistory";
+import SideBarFooter from "./SideBarFooter";
+import { useRouter } from "next/navigation";
+import { useContext } from "react";
+import { MessagesContext } from "@/context/MessagesContext";
 
 function AppSideBar() {
+  const router = useRouter();
+
+  const { setMessages } = useContext(MessagesContext);
+
+  const handleNewChat = () => {
+    // reset messages
+    setMessages([]);
+    // navigate to Hero page (home)
+    router.push("/");
+  };
+
   return (
     <Sidebar>
-      <SidebarHeader className='p-5'>
-        <FaBolt className='text-2xl m-1  text-blue-600'/>
+      <SidebarHeader className="p-5 border rounded-xl">
+        <FaBolt className="text-2xl m-1 text-blue-600" />
       </SidebarHeader>
-      <SidebarContent className='p-5'>
-        <Button><MessageCircleCodeIcon/>Start New Chat</Button>
+
+      <SidebarContent className="p-5">
+        <Button onClick={handleNewChat}>
+          <MessageCircleCodeIcon /> Start New Chat
+        </Button>
+
         <SidebarGroup>
-            <WorkSpaceHistory/>
+          <WorkSpaceHistory />
         </SidebarGroup>
-        {/* <SidebarGroup /> */}
       </SidebarContent>
+
       <SidebarFooter>
-        <SideBarFooter/>
+        <SideBarFooter />
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }
 
-export default AppSideBar
+export default AppSideBar;

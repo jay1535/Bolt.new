@@ -47,3 +47,14 @@ export const GetUser = query({
     return result;
   },
 });
+
+export const UpdateUser = mutation({
+  args: {
+    userId: v.id("users"),
+    name: v.string(),
+    picture: v.string(),
+  },
+  handler: async (ctx, { userId, name, picture }) => {
+    await ctx.db.patch(userId, { name, picture });
+  },
+});
