@@ -17,6 +17,8 @@ import axios from "axios";
 import { Loader } from "lucide-react";
 import { countToken } from "./ChatView";
 import { UserDetailContext } from "@/context/UserDetailContext";
+import SandpackPreviewClient from "./SandpackPreviewClient";
+import { ActionContext } from "@/context/ActionContext";
 
 
 
@@ -30,11 +32,14 @@ function CodeView() {
   const [loading, setLoading] = useState(false);
   const { userDetails,setUserDetails } = useContext(UserDetailContext);
   const UpdateToken = useMutation(api.users.UpdateToken);
+   const {action, setAction} = useContext(ActionContext)
 
   useEffect (()=>{
 id&&GetFiles();
   },[id])
-
+useEffect(()=>{
+setActiveTab('preview')
+},[action])
 const GetFiles=async ()=>{
   setLoading(true)
   const result = await convex.query(api.workspace.GetWorkspace,{
@@ -127,12 +132,7 @@ const GetFiles=async ()=>{
           />
           </>:
           <>
-          <SandpackPreview
-          showNavigator={true}
-            style={{
-              height: "77vh",
-            }}
-          />
+        <SandpackPreviewClient/>
           </>}
         </SandpackLayout>
       </SandpackProvider>

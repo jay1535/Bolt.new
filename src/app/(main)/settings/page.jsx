@@ -76,7 +76,7 @@ function Settings() {
         variants={fadeUp(0)}
       >
         <User className="w-12 h-12 mx-auto text-green-400 animate-pulse" />
-        <h2 className="font-extrabold text-4xl md:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-green-500 to-gray-300">
+        <h2 className="p-10 font-extrabold text-4xl md:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-green-500 to-gray-300">
           Settings
         </h2>
         <p className="max-w-2xl text-base md:text-lg text-gray-400 mx-auto">

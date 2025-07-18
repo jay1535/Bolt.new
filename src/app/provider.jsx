@@ -9,10 +9,14 @@ import { useConvex } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AppSideBar from "@/components/ui/custom/AppSideBar";
+import { ActionContext } from "@/context/ActionContext";
+import { useRouter } from "next/navigation";
 function Provider({ children }) {
   const [messages, setMessages] = useState();
   const [userDetails, setUserDetails] = useState();
+  const [action, setAction] = useState();
   const convex = useConvex();
+  const router = useRouter();
   useEffect(() => {
     isAuthenticated();
   }, []);
@@ -20,6 +24,10 @@ function Provider({ children }) {
   const isAuthenticated = async () => {
     if (typeof window !== "undefined") {
       const user = JSON.parse(localStorage.getItem("user"));
+      if(!user){
+        router.push('/');
+        return;
+      }
       const result = await convex.query(api.users.GetUser, {
         email: user?.email,
       });
@@ -34,6 +42,7 @@ function Provider({ children }) {
       >
         <UserDetailContext.Provider value={{ userDetails, setUserDetails }}>
           <MessagesContext.Provider value={{ messages, setMessages }}>
+             <ActionContext.Provider value={{action, setAction}}>
             <NextThemesProvider
               attribute="class"
               defaultTheme="dark"
@@ -46,6 +55,7 @@ function Provider({ children }) {
               {children}
               </SidebarProvider>
             </NextThemesProvider>
+            </ActionContext.Provider>
           </MessagesContext.Provider>
         </UserDetailContext.Provider>
       </GoogleOAuthProvider>

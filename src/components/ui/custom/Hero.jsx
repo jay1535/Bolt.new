@@ -4,12 +4,13 @@ import { MessagesContext } from "@/context/MessagesContext";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import Colors from "@/data/Colors";
 import Lookup from "@/data/Lookup";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Menu } from "lucide-react";
 import React, { useContext, useState } from "react";
 import SigninDialog from "./SigninDialog";
 import { useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { useRouter } from "next/navigation";
+import { useSidebar } from "@/components/ui/sidebar";
 
 function Hero() {
   const [userInput, setUserInput] = useState("");
@@ -18,6 +19,7 @@ function Hero() {
   const [openDialog, setOpenDialog] = useState(false);
   const CreateWorkspace = useMutation(api.workspace.CreateWorkspace);
   const router = useRouter();
+  const { toggleSidebar } = useSidebar();
 
   const onGenerate = async (input) => {
     if (!input?.trim()) return;
@@ -42,8 +44,8 @@ function Hero() {
   };
 
   return (
-    <div className="mt-5 flex flex-1 flex-col items-center  text-center min-h-screen p-20 md:p-32 lg:px-48">
-      <div>
+    <div className="relative mt-5 flex flex-1 flex-col items-center justify-center text-center md:p-50  xl:pl-100 xl:pt-50">
+    
         <h2 className="font-bold text-3xl">{Lookup.HERO_HEADING}</h2>
         <p className="text-gray-400 font-medium mt-2">{Lookup.HERO_DESC}</p>
 
@@ -86,7 +88,15 @@ function Hero() {
             </h2>
           ))}
         </div>
-      </div>
+     
+
+      {/* Sidebar Toggle Button (now on right) */}
+      <button
+        onClick={toggleSidebar}
+        className="fixed bottom-4 right-4 bg-gray-800 hover:bg-gray-700 p-2 rounded-full shadow-md"
+      >
+        <Menu className="text-white w-5 h-5" />
+      </button>
 
       {/* Sign In Dialog */}
       <SigninDialog
