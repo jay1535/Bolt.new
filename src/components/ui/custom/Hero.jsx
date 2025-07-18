@@ -42,7 +42,7 @@ function Hero() {
   };
 
   return (
-    <div className="flex flex-col items-center mt-36 xl:mt-52 gap-2">
+    <div className="flex flex-col items-center text-center min-h-screen mt-36 xl:mt-52 gap-2">
       <h2 className="font-bold text-3xl">{Lookup.HERO_HEADING}</h2>
       <p className="text-gray-400 font-medium">{Lookup.HERO_DESC}</p>
 
