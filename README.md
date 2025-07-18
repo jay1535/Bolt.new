@@ -1,36 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# ⚡ Bolt.new
 
-## Getting Started
+A fast, collaborative workspace builder inspired by [bolt.new](https://bolt.new), built with **Next.js**, **Convex**, **Gemini AI**, **Sandbox**, and **shadcn/ui**.  
+It offers real-time sync, intelligent AI assistance, and a sandboxed environment — all in a lightweight, beautiful, and seamless experience.
 
-First, run the development server:
+---
 
+## 🚀 Tech Stack
+
+- [Next.js](https://nextjs.org/) — React framework for frontend & server-side rendering
+- [Convex](https://convex.dev/) — Real-time backend & database
+- [Gemini AI](https://deepmind.google/technologies/gemini/) — Intelligent AI suggestions
+- [Sandbox](https://codesandbox.io/) — Isolated execution environments
+- [shadcn/ui](https://ui.shadcn.com/) — Accessible, modern UI components with TailwindCSS
+
+---
+
+## 📦 Getting Started
+
+### 1️⃣ Clone the repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/your-username/bolt-clone.git
+cd bolt-clone
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📦 Install Dependencies
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+To set up the project, install all required dependencies for the core stack and integrations:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 📝 Core project dependencies
+```bash
+npm install
+npm install @google/generative-ai
+npm install @codesandbox/sandpack-react
+npx shadcn-ui@latest init
+npm install convex
+npm install @convex-dev/convex-cli --save-dev
+```
+## 🚀 Run Development Server
 
-## Learn More
+Start both the **Convex backend** and the **Next.js frontend** for local development.
 
-To learn more about Next.js, take a look at the following resources:
+### 🪄 Start Convex (Backend)
+Run the Convex development server in one terminal:
+```bash
+npx convex dev
+```
+### 🌐 Start Next.js (Frontend)
+In another terminal, start the Next.js development server:
+```bash
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🔐 Environment Variables
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+To run the project, you need to set up the required environment variables.  
+These are used to configure authentication, Convex deployment, and Gemini AI access.
 
-## Deploy on Vercel
+### 📄 Steps to Add Environment Variables
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1️⃣ In the root of your project, create a file named:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+2️⃣ Open the `.env.local` file in your editor and add the following variables:
+```env
+# Google OAuth Client ID
+NEXT_PUBLIC_GOOGLE_AUTH_CLIENT_ID_KEY=your_google_oauth_client_id
+
+# Convex deployment used by `npx convex dev`
+CONVEX_DEPLOYMENT=your_convex_deployment_id
+
+# Convex URL
+NEXT_PUBLIC_CONVEX_URL=https://your-convex-instance.convex.cloud
+
+# Gemini AI API Key
+NEXT_PUBLIC_GEMINI_API_KEY=your_gemini_api_key
+```
+
+## 👨‍💻 Author
+
+- [Jayant R Habbu](https://github.com/jay1535) — Creator & Maintainer
+
+---
+
+## 🙏 Acknowledgments
+
+Big thanks to the creators and communities of these amazing tools & services that made this project possible:
+- [Next.js](https://nextjs.org/) — The React framework
+- [Convex](https://convex.dev/) — Real-time backend & database
+- [Gemini AI](https://deepmind.google/technologies/gemini/) — AI suggestions & insights
+- [shadcn/ui](https://ui.shadcn.com/) — Accessible, beautiful UI components
+- [CodeSandbox](https://codesandbox.io/) — Sandboxed development environments
+- [TailwindCSS](https://tailwindcss.com/) — Utility-first CSS framework
+
+And to the [bolt.new](https://bolt.new) team for inspiring this clone project!
+
+---
+
+## 🤝 Contributions
+
+Contributions, issues, and feature requests are welcome!  
+Feel free to:
+- ⭐ Star the project
+- 🐛 Report a bug
+- ✨ Suggest a feature
+- 📄 Submit a pull request
