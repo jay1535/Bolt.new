@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext } from "react";
+import React from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -15,14 +15,18 @@ import { MessageCircleCodeIcon } from "lucide-react";
 import WorkSpaceHistory from "./WorkSpaceHistory";
 import SideBarFooter from "./SideBarFooter";
 import { useRouter } from "next/navigation";
+import { useContext } from "react";
 import { MessagesContext } from "@/context/MessagesContext";
 
 function AppSideBar() {
   const router = useRouter();
-  const { setMessages } = useContext(MessagesContext) || {};
+
+  const { setMessages } = useContext(MessagesContext);
 
   const handleNewChat = () => {
-    setMessages?.([]);
+    // reset messages
+    setMessages([]);
+    // navigate to Hero page (home)
     router.push("/");
   };
 

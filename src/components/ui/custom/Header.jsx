@@ -2,7 +2,7 @@
 
 import React, { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Zap, Rocket, Download } from "lucide-react";
+import { Zap, Rocket, Download } from "lucide-react"; // Lucide icons
 import { Button } from "../button";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import SigninDialog from "./SigninDialog";
@@ -10,17 +10,17 @@ import Image from "next/image";
 import { ActionContext } from "@/context/ActionContext";
 
 function Header() {
+  const { userDetails } = useContext(UserDetailContext);
   const router = useRouter();
-  const { userDetails } = useContext(UserDetailContext) || {};
-  const { action, setAction } = useContext(ActionContext) || {};
-  const [showSignIn, setShowSignIn] = useState(false);
+  const {action, setAction} = useContext(ActionContext);
 
-  const onAction = (type) => {
-    setAction?.({
-      actionType: type,
-      timeStamp: Date.now(),
-    });
-  };
+  const [showSignIn, setShowSignIn] = useState(false);
+  const onAction=(action)=>{
+ setAction({
+  actionType:action,
+  timeStamp:Date.now()
+ })
+  }
 
   const handleGetStarted = () => {
     if (!userDetails?.name) {
@@ -29,6 +29,8 @@ function Header() {
       router.push("/dashboard");
     }
   };
+
+ 
 
   return (
     <div
@@ -63,14 +65,18 @@ function Header() {
             <Button
               variant="ghost"
               className="text-white flex gap-1 items-center"
-              onClick={() => onAction("export")}
+              onClick={()=>{
+                onAction('export')
+              }}
             >
-              <Download className="w-4 h-4" /> Export
+              <Download className="w-4 h-4"  /> Export
             </Button>
             <Button
               variant="outline"
               className="border-blue-600 bg-gradient-to-l from-blue-900 via-blue-800 to-blue-600 text-white flex gap-1 items-center"
-              onClick={() => onAction("deploy")}
+                onClick={()=>{
+                onAction('deploy')
+              }}
             >
               <Rocket className="w-4 h-4" /> Deploy
             </Button>

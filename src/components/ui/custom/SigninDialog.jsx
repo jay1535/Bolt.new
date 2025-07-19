@@ -27,16 +27,18 @@ function SigninDialog({ openDialog, closeDialog }) {
   }, []);
 
   const googleLogin = useGoogleLogin({
-    onSuccess: async ({ access_token }) => {
+    onSuccess: async (tokenResponse) => {
       try {
-        const { data: user } = await axios.get(
+        const userInfo = await axios.get(
           "https://www.googleapis.com/oauth2/v3/userinfo",
           {
             headers: {
-              Authorization: `Bearer ${access_token}`,
+              Authorization: `Bearer ${tokenResponse.access_token}`,
             },
           }
         );
+
+        const user = userInfo.data;
 
         await CreateUser({
           name: user?.name,
@@ -56,8 +58,8 @@ function SigninDialog({ openDialog, closeDialog }) {
         alert("Something went wrong during sign-in. Please try again.");
       }
     },
-    onError: (error) => {
-      console.error("Google Login error:", error);
+    onError: (errorResponse) => {
+      console.error("Google Login error:", errorResponse);
       alert("Google sign-in failed. Please try again.");
     },
   });
@@ -68,7 +70,7 @@ function SigninDialog({ openDialog, closeDialog }) {
     <Dialog open={openDialog} onOpenChange={closeDialog}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Sign In</DialogTitle>
+          <DialogTitle />
         </DialogHeader>
 
         <div className="flex flex-col items-center justify-center gap-2">
@@ -88,7 +90,7 @@ function SigninDialog({ openDialog, closeDialog }) {
             Sign in with Google
           </Button>
 
-          <p className="text-sm text-gray-500 mt-2 text-center">
+          <p className="text-sm text-gray-500 mt-2">
             {Lookup.SIGNIn_AGREEMENT_TEXT}
           </p>
         </div>

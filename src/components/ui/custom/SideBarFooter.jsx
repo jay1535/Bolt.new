@@ -5,12 +5,12 @@ import React, { useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '../button';
 import { UserDetailContext } from '@/context/UserDetailContext';
-import { useSidebar } from '../sidebar';
+import { useSidebar } from "../sidebar";
 
 function SideBarFooter() {
   const router = useRouter();
   const { setUserDetails } = useContext(UserDetailContext);
-  const { toggleSidebar } = useSidebar() || {};
+  const { toggleSidebar } = useSidebar();
 
   const options = [
     {
@@ -32,8 +32,8 @@ function SideBarFooter() {
       name: 'Sign Out',
       icon: LogOut,
       action: () => {
-        setUserDetails?.(null);
-        router.push('/');
+        setUserDetails(null);
+        router.push('/'); // redirect to home or login
         console.log('User signed out');
       },
     },
@@ -48,24 +48,25 @@ function SideBarFooter() {
       console.warn(`No action or path defined for ${option.name}`);
     }
 
-    if (toggleSidebar) toggleSidebar();
+    // Close sidebar
+    toggleSidebar();
   };
 
   return (
     <div className="p-2 mb-10">
-      {options.map(({ name, icon: Icon, ...rest }, index) => (
+      {options.map((option, index) => (
         <Button
-          onClick={() => onOptionClick({ name, icon: Icon, ...rest })}
-          key={name || index}
+          onClick={() => onOptionClick(option)}
+          key={index}
           variant="ghost"
           className="w-full flex justify-start my-3 gap-2"
         >
-          <Icon />
-          {name}
+          <option.icon />
+          {option.name}
         </Button>
       ))}
     </div>
   );
 }
 
-export default SideBarFooter;
+export default SideBarFooter; 
