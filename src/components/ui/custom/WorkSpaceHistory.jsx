@@ -17,19 +17,19 @@ function WorkSpaceHistory() {
 
   useEffect(() => {
     if (userDetails?._id) {
-      GetAllWorkspace();
+      fetchWorkspaces();
     }
-  }, [userDetails]);
+  }, [userDetails?._id]);
 
-  const GetAllWorkspace = async () => {
+  const fetchWorkspaces = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
       const result = await convex.query(api.workspace.GetAllWorkspace, {
         userId: userDetails._id,
       });
-      setWorkspaceList(result);
+      setWorkspaceList(result ?? []);
     } catch (error) {
-      console.error("Failed to fetch workspaces", error);
+      console.error("Failed to fetch workspaces:", error);
     } finally {
       setLoading(false);
     }
@@ -44,21 +44,17 @@ function WorkSpaceHistory() {
         style={{ backgroundColor: "rgba(30, 41, 59, 0.6)" }}
       >
         {loading ? (
-          <p className="text-md text-gray-300">Loading workspaces...</p>
+          <p className="text-md text-gray-300">Loading workspaces…</p>
         ) : workspaceList.length > 0 ? (
           workspaceList.map((workspace) => (
-            <div
+            <Link
               key={workspace._id}
-              className="flex p-2 rounded-md cursor-pointer hover:bg-gray-800 transition-colors"
+              href={`/workspace/${workspace._id}`}
+              onClick={toggleSidebar}
+              className="block p-2 rounded-md text-sm text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
             >
-              <Link
-                href={`/workspace/${workspace._id}`}
-                onClick={toggleSidebar}
-                className="flex-1 text-sm text-gray-300 hover:text-white"
-              >
-                {workspace?.messages?.[0]?.context ?? "No context"}
-              </Link>
-            </div>
+              {workspace?.messages?.[0]?.context?.slice(0, 50) || "No context"}
+            </Link>
           ))
         ) : (
           <p className="text-md text-white">No workspaces found.</p>

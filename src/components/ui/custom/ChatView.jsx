@@ -21,16 +21,15 @@ export const countToken = (inputText) => {
     .filter((word) => word).length;
 };
 
-
 function ChatView() {
   const { id } = useParams();
   const convex = useConvex();
-  const { messages, setMessages } = useContext(MessagesContext);
-  const { userDetails,setUserDetails } = useContext(UserDetailContext);
-  const UpdateMessages= useMutation(api.workspace.UpdateMessages);
+  const { messages = [], setMessages } = useContext(MessagesContext) || {};
+  const { userDetails = {}, setUserDetails } = useContext(UserDetailContext) || {};
+  const UpdateMessages = useMutation(api.workspace.UpdateMessages);
   const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const {toggleSidebar} = useSidebar();
+  const { toggleSidebar } = useSidebar() || {};
   const UpdateToken = useMutation(api.users.UpdateToken);
 
   // fetch workspace data when id changes
@@ -39,26 +38,31 @@ function ChatView() {
   }, [id]);
 
   const GetWorkspaceData = async () => {
-    const result = await convex.query(api.workspace.GetWorkspace, {
-      workspaceId: id,
-    });
-    setMessages(result?.messages || []);
-    console.log("workspace data", result);
+    try {
+      const result = await convex.query(api.workspace.GetWorkspace, {
+        workspaceId: id,
+      });
+      setMessages?.(result?.messages || []);
+      console.log("workspace data", result);
+    } catch (err) {
+      console.error("Error fetching workspace data:", err);
+    }
   };
 
   // trigger AI response when a user message is added
   useEffect(() => {
     if (messages?.length > 0) {
-      const lastRole = messages[messages.length - 1].role;
+      const lastRole = messages[messages.length - 1]?.role;
       if (lastRole === "user") {
         GetAiResponse();
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
 
   const GetAiResponse = async () => {
     setLoading(true);
-    const PROMPT = JSON.stringify(messages) + Prompt.CHAT_PROMPT;
+    const PROMPT = JSON.stringify(messages) + Prompt?.CHAT_PROMPT;
 
     try {
       const result = await axios.post("/api/ai-chat", {
@@ -77,44 +81,47 @@ function ChatView() {
         } else {
           aiText = JSON.stringify(result.data.result);
         }
-      } else { 
+      } else {
         aiText = JSON.stringify(result.data);
       }
-    const aiResp = {
+
+      const aiResp = {
         role: "ai",
         context: aiText,
       };
-      setMessages((prev) => [
-        ...prev,
-       aiResp,
-      ]);
 
- const token = Number(userDetails?.token) - Number(countToken(JSON.stringify(aiResp)));
-    setUserDetails(prev=>( {...prev, token: token}))
-    await UpdateToken({
-      token: token,
-      userId: userDetails?._id
-    })
+      setMessages?.((prev) => [...prev, aiResp]);
+
+      const token =
+        Number(userDetails?.token || 0) -
+        Number(countToken(JSON.stringify(aiResp)));
+
+      setUserDetails?.((prev) => ({ ...prev, token }));
+
+      await UpdateToken({
+        token,
+        userId: userDetails?._id,
+      });
 
       await UpdateMessages({
-      workspaceId: id,
-      messages: [...messages, aiResp],
-    });
+        workspaceId: id,
+        messages: [...messages, aiResp],
+      });
     } catch (err) {
-      console.error(err);
-      setMessages((prev) => [
+      console.error("AI response error:", err);
+      setMessages?.((prev) => [
         ...prev,
         { role: "ai", context: "Error: Could not generate response." },
       ]);
     }
-    
+
     setLoading(false);
   };
 
   const onGenerate = (input) => {
     if (!input.trim()) return;
 
-    setMessages((prev) => [
+    setMessages?.((prev) => [
       ...prev,
       {
         role: "user",
@@ -127,99 +134,93 @@ function ChatView() {
 
   return (
     <div className="flex">
-  {/* Sidebar */}
-  <div
-    className="flex flex-col  justify-end items-center w-15 h-full p-2"
-    style={{ backgroundColor: "transparent" }}
-  >
-    {userDetails && (
-      <Image
-      onClick={toggleSidebar}
-        src={userDetails.picture}
-        alt="UserPicture"
-        width={30}
-        height={30}
-        className="rounded-full mb-2"
-      />
-    )}
-  </div>
-
-
-    <div className="relative h-[85vh]  flex flex-col flex-1">
-      {/* Messages */}
-      <div className="flex-1 overflow-y-scroll mb-2 px-2">
-        {messages?.map((msg, index) => (
-          <div
-            key={index}
-            className="p-3 rounded-lg mb-2 flex gap-2 items-start leading-7"
-            style={{
-              backgroundColor: Colors.BACKGROUND,
-            }}
-          >
-            {msg?.role === "user" && userDetails?.picture && (
-              <Image
-                src={userDetails.picture}
-                alt="user"
-                width={35}
-                height={35}
-                className="rounded-lg"
-              />
-            )}
-            <h2 className='flex flex-col'>
-            <ReactMarkdown>{msg?.context || "No content"}</ReactMarkdown>
-            </h2>
-          </div>
-        ))}
-
-        {loading && (
-          <div
-            className="p-3 rounded-lg mb-2 flex gap-2 items-start"
-            style={{
-              backgroundColor: Colors.BACKGROUND,
-            }}
-          >
-            <Loader2Icon className="animate-spin" />
-            <h2>Generating response…</h2>
-          </div>
+      {/* Sidebar */}
+      <div
+        className="flex flex-col justify-end items-center w-15 h-full p-2"
+        style={{ backgroundColor: "transparent" }}
+      >
+        {userDetails?.picture && (
+          <Image
+            onClick={toggleSidebar}
+            src={userDetails.picture}
+            alt="UserPicture"
+            width={30}
+            height={30}
+            className="rounded-full mb-2 cursor-pointer"
+          />
         )}
       </div>
 
+      <div className="relative h-[85vh] flex flex-col flex-1">
+        {/* Messages */}
+        <div className="flex-1 overflow-y-scroll mb-2 px-2">
+          {messages?.map((msg, index) => (
+            <div
+              key={index}
+              className="p-3 rounded-lg mb-2 flex gap-2 items-start leading-7"
+              style={{
+                backgroundColor: Colors?.BACKGROUND,
+              }}
+            >
+              {msg?.role === "user" && userDetails?.picture && (
+                <Image
+                  src={userDetails.picture}
+                  alt="user"
+                  width={35}
+                  height={35}
+                  className="rounded-lg"
+                />
+              )}
+              <h2 className="flex flex-col">
+                <ReactMarkdown>{msg?.context || "No content"}</ReactMarkdown>
+              </h2>
+            </div>
+          ))}
 
-      {/* Input Section */}
-      
-      <div
-        style={{
-          backgroundColor: Colors.BACKGROUND,
-        }}
-        className="animate-borderGlow p-5 border border-blue-800 rounded-xl max-w-2xl mt-3 w-full shadow-[0_0_10px_rgba(59,130,246,0.7)] transition duration-300"
-      >
-        <div className="flex gap-2">
-          <textarea
-          
-            className="outline-none bg-transparent w-full h-22 max-h-56 resize-none"
-            placeholder={Lookup.INPUT_PLACEHOLDER}
-            value={userInput}
-            onChange={(event) => setUserInput(event.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault(); // Prevent newline
-                onGenerate(userInput);
-              }
-            }}
-          />
-          {userInput.trim() && (
-            <ArrowRight
-              onClick={() => onGenerate(userInput)}
-              className="bg-gradient-to-t from-blue-600 to-blue-900 p-2 h-8 w-14 
-              rounded-md cursor-pointer"
-            />
+          {loading && (
+            <div
+              className="p-3 rounded-lg mb-2 flex gap-2 items-start"
+              style={{
+                backgroundColor: Colors?.BACKGROUND,
+              }}
+            >
+              <Loader2Icon className="animate-spin" />
+              <h2>Generating response…</h2>
+            </div>
           )}
         </div>
+
+        {/* Input Section */}
+        <div
+          style={{
+            backgroundColor: Colors?.BACKGROUND,
+          }}
+          className="animate-borderGlow p-5 border border-blue-800 rounded-xl max-w-2xl mt-3 w-full shadow-[0_0_10px_rgba(59,130,246,0.7)] transition duration-300"
+        >
+          <div className="flex gap-2">
+            <textarea
+              className="outline-none bg-transparent w-full h-22 max-h-56 resize-none"
+              placeholder={Lookup?.INPUT_PLACEHOLDER}
+              value={userInput}
+              onChange={(event) => setUserInput(event.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault(); // Prevent newline
+                  onGenerate(userInput);
+                }
+              }}
+            />
+            {userInput.trim() && (
+              <ArrowRight
+                onClick={() => onGenerate(userInput)}
+                className="bg-gradient-to-t from-blue-600 to-blue-900 p-2 h-8 w-14 rounded-md cursor-pointer"
+              />
+            )}
+          </div>
+        </div>
       </div>
-      
     </div>
-    </div>
-  
   );
 }
+
 export default ChatView;

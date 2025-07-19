@@ -16,8 +16,6 @@ export async function POST(req) {
 
     const result = await GenAiCode.sendMessage(prompt);
 
-    console.log("[API] result:", result);
-
     if (!result || !result.response) {
       console.error("[API] No response from AI model");
       return NextResponse.json(
@@ -26,28 +24,29 @@ export async function POST(req) {
       );
     }
 
-    const response = result.response;
-
+    let response = result.response;
     let data;
 
-    if (typeof response.text === "function") {
-      // response is a fetch-like Response
+    // If response is a fetch-like Response
+    if (typeof response?.text === "function") {
       const respText = await response.text();
       console.log("[API] respText:", respText);
 
       try {
         data = JSON.parse(respText);
-      } catch {
-        console.error("[API] Failed to parse JSON from AI response");
+      } catch (err) {
+        console.error("[API] Failed to parse JSON from AI response", err);
         return NextResponse.json(
           { error: "Failed to parse JSON from AI response" },
           { status: 502 }
         );
       }
-    } else if (typeof response === "object") {
-      // already a JS object
+    }
+    // If already an object
+    else if (typeof response === "object") {
       data = response;
-    } else {
+    }
+    else {
       console.error("[API] Unexpected response type:", typeof response);
       return NextResponse.json(
         { error: "Unexpected response type from AI model" },
@@ -57,11 +56,12 @@ export async function POST(req) {
 
     console.log("[API] Final data:", data);
     return NextResponse.json(data);
+
   } catch (e) {
     console.error("[API] Exception:", e);
     return NextResponse.json(
       {
-        error: e.message || "An error occurred while processing your request.",
+        error: e?.message || "An error occurred while processing your request.",
       },
       { status: 500 }
     );
